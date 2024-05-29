@@ -75,8 +75,8 @@ all: main-build
 main-build: ouxt_motor_driver.elf secondary-outputs
 
 # Tool invocations
-ouxt_motor_driver.elf: $(OBJS) $(USER_OBJS) A:\GoogleDrive\user\ouxt\firmware\motor_driver\ouxt_motor_driver\STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "ouxt_motor_driver.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"A:\GoogleDrive\user\ouxt\firmware\motor_driver\ouxt_motor_driver\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ouxt_motor_driver.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+ouxt_motor_driver.elf: $(OBJS) $(USER_OBJS) A:\GoogleDrive\user\ouxt\firmware\thruster_motor_controller\motor_driver_firmware\ouxt_motor_driver\STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "ouxt_motor_driver.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"A:\GoogleDrive\user\ouxt\firmware\thruster_motor_controller\motor_driver_firmware\ouxt_motor_driver\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ouxt_motor_driver.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
