@@ -3,6 +3,7 @@
 
 #include "stm32f7xx_hal.h"
 #include <memory.h>
+#include <math.h>
 
 typedef struct
 {
@@ -15,5 +16,7 @@ typedef struct
 }MotorHandleType;
 
 void motorHandleStructInit(TIM_HandleTypeDef* pTimer, MotorHandleType* pMotor);
+void motorEnablePWM_Output(MotorHandleType* pMotor);
+int8_t motorSetSpeed(MotorHandleType* pMotor, const double duty);
 
 #endif /* INC_MOTOR_H_ */
