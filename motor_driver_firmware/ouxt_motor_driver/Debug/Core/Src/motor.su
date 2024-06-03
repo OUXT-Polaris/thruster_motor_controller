@@ -1,3 +1,0 @@
-../Core/Src/motor.c:16:6:motorHandleStructInit	64	static
-../Core/Src/motor.c:31:6:motorEnablePWM_Output	16	static
-../Core/Src/motor.c:47:8:motorSetSpeed	32	static
