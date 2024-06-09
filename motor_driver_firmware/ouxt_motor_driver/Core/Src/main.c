@@ -56,13 +56,18 @@ static void MX_TIM1_Init(void);
 void StartDefaultTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
-
+static struct receive_data ros_data;
+static struct send_data f7_data;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
+
+/* USER CODE BEGIN Includes */
+#include "rtos_udp.h"
+/* USER CODE END Includes */
 
 /**
   * @brief  The application entry point.
@@ -128,7 +133,7 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
+  UDPDefineTasks();
   /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
@@ -341,28 +346,12 @@ void StartDefaultTask(void const * argument)
   /* init code for LWIP */
   MX_LWIP_Init();
   /* USER CODE BEGIN 5 */
-  struct udp_pcb *pcb;
-  struct pbuf *p;
-  err_t err;
-  ip4_addr_t dst_addr;
-  const unsigned short src_port = 12345;
-  const unsigned short dst_port = 8080;
-
-  IP4_ADDR(&dst_addr,192,168,11,20);
-
-  pcb = udp_new();
-  err = udp_bind(pcb, IP_ADDR_ANY, src_port);
-
-  uint32_t cnt = 0;
-  /* Infinite loop */
   for(;;)
   {
-    p = pbuf_alloc(PBUF_TRANSPORT, sizeof(4), PBUF_RAM);
-    *(uint32_t *)p->payload = cnt++;
-    p->len = 4;
-    err = udp_sendto(pcb, p, &dst_addr, dst_port);
-    pbuf_free(p);
-    osDelay(1000);
+    ros_data = GetROSData();
+    memcpy(&f7_data, &ros_data, sizeof(struct send_data));
+    SendF7Data(&f7_data);
+    osDelay(10);
   }
   /* USER CODE END 5 */
 }
