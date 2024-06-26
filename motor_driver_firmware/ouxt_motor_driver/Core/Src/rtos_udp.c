@@ -12,10 +12,10 @@ static struct receive_data ros_data = { };
 static struct send_data f7_data = { };
 struct timeval tv;
 //IPとポート
-#define F7_ADDR "192.168.0.20"
+#define F7_ADDR "192.168.0.200"
 #define PC_ADDR "192.168.0.100"
-#define F7_PORT 7777
-#define PC_PORT 8888
+#define F7_PORT 1000
+#define PC_PORT 1000
 
 osThreadId udpTaskHandle;
 uint32_t udpTaskBuffer[512];

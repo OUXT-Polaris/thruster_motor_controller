@@ -14,13 +14,11 @@
 #include "lwip/sockets.h"
 
 struct receive_data {
-    int int_sample;
-    float float_sample;
+    double motor_speed;
 };
 
 struct send_data {
-    int int_sample;
-    float float_sample;
+	double motor_speed;
 };
 
 struct receive_data GetROSData();

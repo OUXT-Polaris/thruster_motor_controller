@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "motor.h"
+#include "rtos_udp.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,6 +46,10 @@
 TIM_HandleTypeDef htim1;
 
 osThreadId defaultTaskHandle;
+osTimerId motorTImerHandle;
+osStaticTimerDef_t motorTImerControlBlock;
+osSemaphoreId motorSpeedSemaphoreHandle;
+osStaticSemaphoreDef_t motorSpeedControlBlock;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -54,6 +59,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
 void StartDefaultTask(void const * argument);
+void motorCallback(void const * argument);
 
 /* USER CODE BEGIN PFP */
 static struct receive_data ros_data;
@@ -64,10 +70,6 @@ static struct send_data f7_data;
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
-
-/* USER CODE BEGIN Includes */
-#include "rtos_udp.h"
-/* USER CODE END Includes */
 
 /**
   * @brief  The application entry point.
@@ -115,9 +117,19 @@ int main(void)
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
 
+  /* Create the semaphores(s) */
+  /* definition and creation of motorSpeedSemaphore */
+  osSemaphoreStaticDef(motorSpeedSemaphore, &motorSpeedControlBlock);
+  motorSpeedSemaphoreHandle = osSemaphoreCreate(osSemaphore(motorSpeedSemaphore), 1);
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
+
+  /* Create the timer(s) */
+  /* definition and creation of motorTImer */
+  osTimerStaticDef(motorTImer, motorCallback, &motorTImerControlBlock);
+  motorTImerHandle = osTimerCreate(osTimer(motorTImer), osTimerPeriodic, NULL);
 
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
@@ -354,6 +366,14 @@ void StartDefaultTask(void const * argument)
     osDelay(10);
   }
   /* USER CODE END 5 */
+}
+
+/* motorCallback function */
+void motorCallback(void const * argument)
+{
+  /* USER CODE BEGIN motorCallback */
+
+  /* USER CODE END motorCallback */
 }
 
 /**
