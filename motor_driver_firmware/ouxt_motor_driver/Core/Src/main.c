@@ -37,7 +37,7 @@ typedef StaticTask_t osStaticThreadDef_t;
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+MotorHandleType motor = {};
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -107,7 +107,6 @@ int main(void)
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
-  MotorHandleType motor = {};
   /*Initialize structure of motor handler*/
   motorHandleStructInit(&htim1, &motor);
   /*Enable to output PWM */
@@ -138,7 +137,7 @@ int main(void)
 
   /* Create the thread(s) */
   /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, (void*) &motor, &defaultTask_attributes);
+  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -360,7 +359,7 @@ void StartDefaultTask(void *argument)
     }else {
     	ratio = ratio + 0.01;
     }
-	motorSetSpeed((MotorHandleType *)argument, ratio);
+	motorSetSpeed(&motor, ratio);
     osDelay(10);
   }
   /* USER CODE END 5 */
