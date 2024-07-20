@@ -116,7 +116,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
     PE10     ------> TIM1_CH2N
     PE11     ------> TIM1_CH2
     */
-    GPIO_InitStruct.Pin = MotorA_Low_Pin|MotorA_High_Pin|MotorB_Low_Pin|MotorB_LowE11_Pin;
+    GPIO_InitStruct.Pin = MotorA_Low_Pin|MotorA_High_Pin|MotorB_Low_Pin|MotorB_High_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;

@@ -70,7 +70,7 @@ int8_t motorSetSpeed(MotorHandleType* pMotor, const double duty)
 	}
 
 	/*Enable code below if pwm signal was not output */
-	//motorEnablePWM_Output(&pMotor);
+	motorEnablePWM_Output(pMotor);
 
 	return 0;
 }

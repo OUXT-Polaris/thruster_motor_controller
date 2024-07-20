@@ -65,8 +65,8 @@ void Error_Handler(void);
 #define MotorA_High_GPIO_Port GPIOE
 #define MotorB_Low_Pin GPIO_PIN_10
 #define MotorB_Low_GPIO_Port GPIOE
-#define MotorB_LowE11_Pin GPIO_PIN_11
-#define MotorB_LowE11_GPIO_Port GPIOE
+#define MotorB_High_Pin GPIO_PIN_11
+#define MotorB_High_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
