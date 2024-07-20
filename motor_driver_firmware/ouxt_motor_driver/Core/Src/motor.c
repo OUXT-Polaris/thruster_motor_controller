@@ -19,6 +19,12 @@ void motorHandleStructInit(TIM_HandleTypeDef* pTimer, MotorHandleType* pMotor)
 	/*Timer clock is double of peripheral clock */
 	const uint32_t	source_clk_freq	= 2 * ((pTimer->Instance == TIM1 || pTimer->Instance == TIM8) ? HAL_RCC_GetPCLK2Freq() : HAL_RCC_GetPCLK1Freq());
 	uint32_t		frequency		= source_clk_freq / ((uint32_t)period * pTimer->Instance->PSC + 1);
+
+//	pMotor->pTimer = pTimer;
+//	pMotor->period = period;
+//	pMotor->frequency = frequency;
+//	pMotor->current_duty = 0.0;
+//	pMotor->previous_duty = 0.0;
 	MotorHandleType	motor_			= {pTimer, period, frequency, 0.0, 0.0};
 	memcpy(pMotor, &motor_, sizeof(motor_));
 }

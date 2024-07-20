@@ -7,7 +7,7 @@
 
 typedef struct
 {
-	TIM_HandleTypeDef* 	pTimer;
+	const TIM_HandleTypeDef* const pTimer;
 	const uint16_t		period;
 	const uint32_t		frequency;
 	double				current_duty;	// duty is input -1.0 ~ 1.0
