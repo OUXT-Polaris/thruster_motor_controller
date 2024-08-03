@@ -372,11 +372,12 @@ void StartDefaultTask(void const * argument)
 //  socklen_t len = sizeof(rxAddr); //rxAddrのサイズ
 
   /* Infinite loop */
-  double ratio = -1.0;
+  const double max_ratio = 0.3;
+  double ratio = -max_ratio;
   for(;;)
   {
-	if(ratio >= 1.0) {
-		ratio = -1.0;
+	if(ratio >= max_ratio) {
+		ratio = -max_ratio;
 	}else {
 		ratio = ratio + 0.01;
 	}
