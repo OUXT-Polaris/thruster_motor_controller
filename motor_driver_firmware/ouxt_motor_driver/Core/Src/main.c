@@ -25,6 +25,11 @@
 /* USER CODE BEGIN Includes */
 #include "motor.h"
 #include "sockets.h"
+#include "thruster_command.pb.h"
+#include "pb.h"
+#include "pb_common.h"
+#include "pb_decode.h"
+#include "pb_encode.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -347,29 +352,17 @@ static void MX_GPIO_Init(void)
 void StartDefaultTask(void const * argument)
 {
   /* init code for LWIP */
-  // MX_LWIP_Init();
+  MX_LWIP_Init();
   /* USER CODE BEGIN 5 */
   /// This code from https://zenn.dev/legityew/articles/080680f2539068#%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0
+  /// See also https://qiita.com/Kosuke_Matsui/items/878b4f511366675d9428#%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E5%AE%9F%E4%BD%93%E3%81%AE%E4%BD%9C%E6%88%90-1
   /// It will be replace in the near future
-//  uint8_t rxbuf[4];
-//  uint8_t txbuf[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
-//  struct sockaddr_in rxAddr,txAddr;
-//  int socket = lwip_socket(AF_INET, SOCK_DGRAM, 0);
-//  memset((char*) &txAddr, 0, sizeof(txAddr));
-//  memset((char*) &rxAddr, 0, sizeof(rxAddr));
-//
-//  //アドレスの構造体のデータを定義
-//  rxAddr.sin_family = AF_INET; //プロトコルファミリの設定(IPv4に設定)
-//  rxAddr.sin_len = sizeof(rxAddr); //アドレスのデータサイズ
-//  rxAddr.sin_addr.s_addr = INADDR_ANY; //アドレスの設定(今回はすべてのアドレスを受け入れるためINADDR_ANY)
-//  rxAddr.sin_port = lwip_htons(PC_PORT); //ポートの指定
-//  txAddr.sin_family = AF_INET; //プロトコルファミリの指定(IPv4に設定)
-//  txAddr.sin_len = sizeof(txAddr); //アドレスのデータのサイズ
-//  txAddr.sin_addr.s_addr = inet_addr(PC_ADDR); //アドレスの設定
-//  txAddr.sin_port = lwip_htons(PC_PORT); //ポートの指定
-//  (void)lwip_bind(socket, (struct sockaddr*)&rxAddr, sizeof(rxAddr)); //IPアドレスとソケットを紐付けて受信をできる状態に
-//  socklen_t n; //受信したデータのサイズ
-//  socklen_t len = sizeof(rxAddr); //rxAddrのサイズ
+  uint8_t message_buffer[128];
+  pb_istream_t istream = pb_istream_from_buffer(message_buffer, sizeof(message_buffer));
+  communication_Thrust message = communication_Thrust_init_zero;
+  if(pb_encode(&istream, &communication_Thrust_msg, &message)) {
+
+  }
 
   /* Infinite loop */
   const double max_ratio = 0.3;
