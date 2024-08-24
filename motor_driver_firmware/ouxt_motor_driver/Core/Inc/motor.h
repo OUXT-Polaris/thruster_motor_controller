@@ -17,6 +17,6 @@ typedef struct
 
 void motorHandleStructInit(TIM_HandleTypeDef* pTimer, MotorHandleType* pMotor);
 void motorEnablePWM_Output(MotorHandleType* pMotor);
-int8_t motorSetSpeed(MotorHandleType* pMotor, const double duty);
+int8_t motorSetSpeed(MotorHandleType* pMotor, const double duty, const double max_duty);
 
 #endif /* INC_MOTOR_H_ */

@@ -50,9 +50,9 @@ void motorEnablePWM_Output(MotorHandleType* pMotor)
   * @param  pMotor : Pointer of motor handler is enabled PWM
   * @retval returned 0xFF is duty was out of range
   */
-int8_t motorSetSpeed(MotorHandleType* pMotor, const double duty)
+int8_t motorSetSpeed(MotorHandleType* pMotor, const double duty, const double max_duty)
 {
-	if(duty > 1.0 || -1.0 > duty) return -1; // out of input range;
+	if(duty > max_duty || -max_duty > duty) return -1; // out of input range;
 
 	/*update duty information in motor handler*/
 	pMotor->previous_duty = pMotor->current_duty;
