@@ -387,9 +387,8 @@ void StartDefaultTask(void const * argument)
   {
 	  lwip_recvfrom(socket, (uint8_t*) message_buffer, sizeof(message_buffer), (int) NULL, (struct sockaddr*) &rxAddr, &len);
 	  if(pb_decode(&istream, &communication_Thrust_msg, &message)) {
-
+		motorSetSpeed(&motor, message.thrust, 0.3);
 	  }
-	  // motorSetSpeed(&motor, ratio);
 	  osDelay(10);
   }
   /* USER CODE END 5 */
