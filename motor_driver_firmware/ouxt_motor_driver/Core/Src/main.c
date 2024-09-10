@@ -30,14 +30,16 @@
 #include "pb_common.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
+#include "udp.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-#define F7_ADDR "192.168.0.200"
-#define PC_ADDR "192.168.0.100"
-#define F7_PORT 1000
-#define PC_PORT 1000
+#define LWIP_TIMEVAL_PRIVATE	0
+/* ping */
+#define PING_USE_SOCKETS	1	//1=ping_thread
+#define sys_msleep	vTaskDelay
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -165,6 +167,10 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  /** Configure LSE Drive Capability
+  */
+  HAL_PWR_EnableBkUpAccess();
 
   /** Configure the main internal regulator output voltage
   */
@@ -309,10 +315,11 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
-  __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOG_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2, GPIO_PIN_RESET);
@@ -359,21 +366,16 @@ void StartDefaultTask(void const * argument)
   communication_Thrust message = communication_Thrust_init_zero;
 
   //アドレスを宣言
-  struct sockaddr_in rxAddr,txAddr;
+  struct sockaddr_in rxAddr;
   //ソケットを作成
   int socket = lwip_socket(AF_INET, SOCK_DGRAM, 0);
   //アドレスのメモリを確保
-  memset((char*) &txAddr, 0, sizeof(txAddr));
   memset((char*) &rxAddr, 0, sizeof(rxAddr));
   //アドレスの構造体のデータを定義
   rxAddr.sin_family = AF_INET; //プロトコルファミリの設定(IPv4に設定)
   rxAddr.sin_len = sizeof(rxAddr); //アドレスのデータサイズ
   rxAddr.sin_addr.s_addr = INADDR_ANY; //アドレスの設定(今回はすべてのアドレスを受け入れるためINADDR_ANY)
-  rxAddr.sin_port = lwip_htons(PC_PORT); //ポートの指定
-  txAddr.sin_family = AF_INET; //プロトコルファミリの指定(IPv4に設定)
-  txAddr.sin_len = sizeof(txAddr); //アドレスのデータのサイズ
-  txAddr.sin_addr.s_addr = inet_addr(PC_ADDR); //アドレスの設定
-  txAddr.sin_port = lwip_htons(PC_PORT); //ポートの指定
+  rxAddr.sin_port = lwip_htons(1000); //ポートの指定
   (void)lwip_bind(socket, (struct sockaddr*)&rxAddr, sizeof(rxAddr)); //IPアドレスとソケットを紐付けて受信をできる状態に
   // socklen_t n; //受信したデータのサイズ
   socklen_t len = sizeof(rxAddr); //rxAddrのサイズ
@@ -392,7 +394,7 @@ void StartDefaultTask(void const * argument)
 
 /**
   * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM10 interrupt took place, inside
+  * @note   This function is called  when TIM14 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
   * a global variable "uwTick" used as application time base.
   * @param  htim : TIM handle
@@ -403,7 +405,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM10) {
+  if (htim->Instance == TIM14) {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
