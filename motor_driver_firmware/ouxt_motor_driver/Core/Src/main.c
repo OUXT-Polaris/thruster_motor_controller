@@ -383,7 +383,7 @@ void StartDefaultTask(void const * argument)
   for(;;)
   {
 	  lwip_recvfrom(socket, (uint8_t*) message_buffer, sizeof(message_buffer), (int) NULL, (struct sockaddr*) &rxAddr, &len);
-	  if(pb_decode(&istream, &communication_Thrust_msg, &message)) {
+		if (pb_decode(&istream, communication_Thrust_fields, &message)) {
 		motorSetSpeed(&motor, message.thrust, 0.3);
 	  }
 	  osDelay(10);
