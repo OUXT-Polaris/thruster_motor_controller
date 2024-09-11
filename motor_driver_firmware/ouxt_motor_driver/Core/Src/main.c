@@ -378,7 +378,7 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	  uint8_t message_buffer[9];
+	  uint8_t message_buffer[communication_Thrust_size];
 	  pb_istream_t istream = pb_istream_from_buffer(message_buffer, sizeof(message_buffer));
 	  communication_Thrust message = communication_Thrust_init_zero;
 	  lwip_recvfrom(socket, (uint8_t*) message_buffer, sizeof(message_buffer), (int) NULL, (struct sockaddr*) &rxAddr, &len);
