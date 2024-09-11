@@ -360,10 +360,6 @@ void StartDefaultTask(void const * argument)
   /// This code from https://zenn.dev/legityew/articles/080680f2539068#%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0
   /// See also https://qiita.com/Kosuke_Matsui/items/878b4f511366675d9428#%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E5%AE%9F%E4%BD%93%E3%81%AE%E4%BD%9C%E6%88%90-1
   /// It will be replace in the near future
-  uint8_t message_buffer[9];
-  pb_istream_t istream = pb_istream_from_buffer(message_buffer, sizeof(message_buffer));
-  communication_Thrust message = communication_Thrust_init_zero;
-
   //アドレスを宣言
   struct sockaddr_in rxAddr;
   //ソケットを作成
@@ -382,6 +378,9 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
+	  uint8_t message_buffer[9];
+	  pb_istream_t istream = pb_istream_from_buffer(message_buffer, sizeof(message_buffer));
+	  communication_Thrust message = communication_Thrust_init_zero;
 	  lwip_recvfrom(socket, (uint8_t*) message_buffer, sizeof(message_buffer), (int) NULL, (struct sockaddr*) &rxAddr, &len);
 		if (pb_decode(&istream, communication_Thrust_fields, &message)) {
 		motorSetSpeed(&motor, message.thrust, 0.3);
