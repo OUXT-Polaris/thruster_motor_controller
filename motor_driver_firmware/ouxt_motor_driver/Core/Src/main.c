@@ -378,12 +378,19 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	  uint8_t message_buffer[communication_Thrust_size];
+	  uint8_t message_buffer[communication_Command_size];
 	  pb_istream_t istream = pb_istream_from_buffer(message_buffer, sizeof(message_buffer));
-	  communication_Thrust message = communication_Thrust_init_zero;
+	  communication_Command message = communication_Command_init_zero;
 	  lwip_recvfrom(socket, (uint8_t*) message_buffer, sizeof(message_buffer), (int) NULL, (struct sockaddr*) &rxAddr, &len);
-		if (pb_decode(&istream, communication_Thrust_fields, &message)) {
-		motorSetSpeed(&motor, message.thrust, 0.3);
+	  if (pb_decode(&istream, communication_Command_fields, &message)) {
+	    switch(message.which_command) {
+	      case communication_Command_thrust_tag:
+	    	motorSetSpeed(&motor, message.command.thrust.thrust, 0.3);
+	    	break;
+	      case communication_Command_emergency_stop_tag:
+	    	motorSetSpeed(&motor, 0.0, 0.3);
+	    	break;
+		}
 	  }
 	  osDelay(10);
   }

@@ -9,6 +9,12 @@
 PB_BIND(communication_Thrust, communication_Thrust, AUTO)
 
 
+PB_BIND(communication_EmergencyStop, communication_EmergencyStop, AUTO)
+
+
+PB_BIND(communication_Command, communication_Command, AUTO)
+
+
 
 #ifndef PB_CONVERT_DOUBLE_FLOAT
 /* On some platforms (such as AVR), double is really float.
