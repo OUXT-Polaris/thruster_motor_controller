@@ -25,7 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include "motor.h"
 #include "sockets.h"
-#include "thruster_command.pb.h"
+#include "proto/thruster_command.pb.h"
 #include "pb.h"
 #include "pb_common.h"
 #include "pb_decode.h"
@@ -370,7 +370,7 @@ void StartDefaultTask(void const * argument)
   rxAddr.sin_family = AF_INET; //プロトコルファミリの設定(IPv4に設定)
   rxAddr.sin_len = sizeof(rxAddr); //アドレスのデータサイズ
   rxAddr.sin_addr.s_addr = INADDR_ANY; //アドレスの設定(今回はすべてのアドレスを受け入れるためINADDR_ANY)
-  rxAddr.sin_port = lwip_htons(1000); //ポートの指定
+  rxAddr.sin_port = lwip_htons(2000); //ポートの指定
   (void)lwip_bind(socket, (struct sockaddr*)&rxAddr, sizeof(rxAddr)); //IPアドレスとソケットを紐付けて受信をできる状態に
   // socklen_t n; //受信したデータのサイズ
   socklen_t len = sizeof(rxAddr); //rxAddrのサイズ
@@ -378,14 +378,37 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	  uint8_t message_buffer[communication_Thrust_size];
-	  pb_istream_t istream = pb_istream_from_buffer(message_buffer, sizeof(message_buffer));
-	  communication_Thrust message = communication_Thrust_init_zero;
-	  lwip_recvfrom(socket, (uint8_t*) message_buffer, sizeof(message_buffer), (int) NULL, (struct sockaddr*) &rxAddr, &len);
-		if (pb_decode(&istream, communication_Thrust_fields, &message)) {
-		motorSetSpeed(&motor, message.thrust, 0.3);
+	uint8_t raw_message_buffer[communication_Command_size];
+	memset(raw_message_buffer, 0, sizeof(raw_message_buffer));
+	lwip_recvfrom(socket, (uint8_t*) raw_message_buffer, sizeof(raw_message_buffer), (int) NULL, (struct sockaddr*) &rxAddr, &len);
+
+	int index = -1;
+	for (int i = communication_Command_size - 1; i >= 0; i--) {
+	  if (raw_message_buffer[i] != 0) {
+	    index = i;
+	    break;
 	  }
-	  osDelay(10);
+	}
+	communication_Command message = communication_Command_init_zero;
+	// If this case, it means all fields in message is zero.
+	if(index == -1) {
+	  motorSetSpeed(&motor, 0.0, 0.3);
+	}
+	else {
+	  uint8_t *message_buffer = (uint8_t *)malloc((index + 1) * sizeof(uint8_t));
+	  memcpy(message_buffer, raw_message_buffer, (index + 1) * sizeof(uint8_t));
+	  pb_istream_t istream = pb_istream_from_buffer(message_buffer, (index + 1) * sizeof(uint8_t));
+	  if (pb_decode(&istream, communication_Command_fields, &message)) {
+		if(message.emergency_stop) {
+		  motorSetSpeed(&motor, 0.0, 0.0);
+		}
+	    else {
+		  motorSetSpeed(&motor, message.thrust, 0.3);
+	    }
+      }
+	  free(message_buffer);
+	}
+	osDelay(10);
   }
   /* USER CODE END 5 */
 }
