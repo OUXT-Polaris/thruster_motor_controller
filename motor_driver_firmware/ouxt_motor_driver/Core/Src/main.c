@@ -389,23 +389,25 @@ void StartDefaultTask(void const * argument)
 	    break;
 	  }
 	}
-	if(index == -1) {
-	  osDelay(10);
-	  continue;
-	}
-	uint8_t *message_buffer = (uint8_t *)malloc((index + 1) * sizeof(uint8_t));
-	memcpy(message_buffer, raw_message_buffer, (index + 1) * sizeof(uint8_t));
-	pb_istream_t istream = pb_istream_from_buffer(message_buffer, (index + 1) * sizeof(uint8_t));
 	communication_Command message = communication_Command_init_zero;
-	if (pb_decode(&istream, communication_Command_fields, &message)) {
-	  if(message.emergency_stop) {
-		motorSetSpeed(&motor, 0.0, 0.0);
-	  }
-      else {
-		motorSetSpeed(&motor, message.thrust, 0.3);
-      }
+	// If this case, it means all fields in message is zero.
+	if(index == -1) {
+	  motorSetSpeed(&motor, 0.0, 0.3);
 	}
-	free(message_buffer);
+	else {
+	  uint8_t *message_buffer = (uint8_t *)malloc((index + 1) * sizeof(uint8_t));
+	  memcpy(message_buffer, raw_message_buffer, (index + 1) * sizeof(uint8_t));
+	  pb_istream_t istream = pb_istream_from_buffer(message_buffer, (index + 1) * sizeof(uint8_t));
+	  if (pb_decode(&istream, communication_Command_fields, &message)) {
+		if(message.emergency_stop) {
+		  motorSetSpeed(&motor, 0.0, 0.0);
+		}
+	    else {
+		  motorSetSpeed(&motor, message.thrust, 0.3);
+	    }
+      }
+	  free(message_buffer);
+	}
 	osDelay(10);
   }
   /* USER CODE END 5 */
