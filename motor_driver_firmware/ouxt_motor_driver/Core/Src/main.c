@@ -378,14 +378,34 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	  uint8_t message_buffer[communication_Command_size];
-	  pb_istream_t istream = pb_istream_from_buffer(message_buffer, sizeof(message_buffer));
-	  communication_Command message = communication_Command_init_zero;
-	  lwip_recvfrom(socket, (uint8_t*) message_buffer, sizeof(message_buffer), (int) NULL, (struct sockaddr*) &rxAddr, &len);
-	  if (pb_decode(&istream, communication_Command_fields, &message)) {
-		motorSetSpeed(&motor, message.thrust, 0.3);
+	uint8_t raw_message_buffer[communication_Command_size];
+	communication_Command message = communication_Command_init_zero;
+	lwip_recvfrom(socket, (uint8_t*) raw_message_buffer, sizeof(raw_message_buffer), (int) NULL, (struct sockaddr*) &rxAddr, &len);
+
+	int index = -1;
+	for (int i = communication_Command_size - 1; i >= 0; i--) {
+	  if (raw_message_buffer[i] == 63) {
+	    index = i;
+	    break;
 	  }
+	}
+	if(index == -1) {
 	  osDelay(10);
+	  continue;
+	}
+	uint8_t *message_buffer = (uint8_t *)malloc((index + 1) * sizeof(uint8_t));
+	memcpy(message_buffer, raw_message_buffer, (index + 1) * sizeof(uint8_t));
+	pb_istream_t istream = pb_istream_from_buffer(message_buffer, (index + 1) * sizeof(uint8_t));
+	if (pb_decode(&istream, communication_Command_fields, &message)) {
+	  if(message.emergency_stop) {
+		motorSetSpeed(&motor, 0.0, 0.0);
+	  }
+      else {
+		motorSetSpeed(&motor, message.thrust, 0.3);
+      }
+	}
+	free(message_buffer);
+	osDelay(10);
   }
   /* USER CODE END 5 */
 }
