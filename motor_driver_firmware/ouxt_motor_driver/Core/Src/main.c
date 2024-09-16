@@ -379,12 +379,12 @@ void StartDefaultTask(void const * argument)
   for(;;)
   {
 	uint8_t raw_message_buffer[communication_Command_size];
-	communication_Command message = communication_Command_init_zero;
+	memset(raw_message_buffer, 0, sizeof(raw_message_buffer));
 	lwip_recvfrom(socket, (uint8_t*) raw_message_buffer, sizeof(raw_message_buffer), (int) NULL, (struct sockaddr*) &rxAddr, &len);
 
 	int index = -1;
 	for (int i = communication_Command_size - 1; i >= 0; i--) {
-	  if (raw_message_buffer[i] == 63) {
+	  if (raw_message_buffer[i] != 0) {
 	    index = i;
 	    break;
 	  }
@@ -396,6 +396,7 @@ void StartDefaultTask(void const * argument)
 	uint8_t *message_buffer = (uint8_t *)malloc((index + 1) * sizeof(uint8_t));
 	memcpy(message_buffer, raw_message_buffer, (index + 1) * sizeof(uint8_t));
 	pb_istream_t istream = pb_istream_from_buffer(message_buffer, (index + 1) * sizeof(uint8_t));
+	communication_Command message = communication_Command_init_zero;
 	if (pb_decode(&istream, communication_Command_fields, &message)) {
 	  if(message.emergency_stop) {
 		motorSetSpeed(&motor, 0.0, 0.0);
