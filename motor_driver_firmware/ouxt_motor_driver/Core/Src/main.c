@@ -25,7 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include "motor.h"
 #include "sockets.h"
-#include "thruster_command.pb.h"
+#include "proto/thruster_command.pb.h"
 #include "pb.h"
 #include "pb_common.h"
 #include "pb_decode.h"
@@ -370,7 +370,7 @@ void StartDefaultTask(void const * argument)
   rxAddr.sin_family = AF_INET; //プロトコルファミリの設定(IPv4に設定)
   rxAddr.sin_len = sizeof(rxAddr); //アドレスのデータサイズ
   rxAddr.sin_addr.s_addr = INADDR_ANY; //アドレスの設定(今回はすべてのアドレスを受け入れるためINADDR_ANY)
-  rxAddr.sin_port = lwip_htons(1000); //ポートの指定
+  rxAddr.sin_port = lwip_htons(2000); //ポートの指定
   (void)lwip_bind(socket, (struct sockaddr*)&rxAddr, sizeof(rxAddr)); //IPアドレスとソケットを紐付けて受信をできる状態に
   // socklen_t n; //受信したデータのサイズ
   socklen_t len = sizeof(rxAddr); //rxAddrのサイズ
@@ -383,14 +383,7 @@ void StartDefaultTask(void const * argument)
 	  communication_Command message = communication_Command_init_zero;
 	  lwip_recvfrom(socket, (uint8_t*) message_buffer, sizeof(message_buffer), (int) NULL, (struct sockaddr*) &rxAddr, &len);
 	  if (pb_decode(&istream, communication_Command_fields, &message)) {
-	    switch(message.which_command) {
-	      case communication_Command_thrust_tag:
-	    	motorSetSpeed(&motor, message.command.thrust.thrust, 0.3);
-	    	break;
-	      case communication_Command_emergency_stop_tag:
-	    	motorSetSpeed(&motor, 0.0, 0.3);
-	    	break;
-		}
+		motorSetSpeed(&motor, message.thrust, 0.3);
 	  }
 	  osDelay(10);
   }
